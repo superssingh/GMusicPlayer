@@ -17,24 +17,24 @@ import java.util.List;
  * Created by santoshsingh on 17/08/17.
  */
 
-public class SongAdapter extends RecyclerView.Adapter<SongAdapter.ViewHolder>{
+public class AudioAdapter extends RecyclerView.Adapter<AudioAdapter.ViewHolder>{
 
     private List<AudioData> audioDataList;
     private BaseFragment.OnFragmentInteractionListener listener;
 
-    public SongAdapter(BaseFragment.OnFragmentInteractionListener listener) {
+    public AudioAdapter(BaseFragment.OnFragmentInteractionListener listener) {
         this.listener=listener;
     }
 
     @Override
-    public SongAdapter.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+    public AudioAdapter.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext())
                 .inflate(R.layout.song_item, parent, false);
         return new ViewHolder(view);
     }
 
     @Override
-    public void onBindViewHolder(final SongAdapter.ViewHolder holder, int position) {
+    public void onBindViewHolder(final AudioAdapter.ViewHolder holder, int position) {
         final AudioData audioData = audioDataList.get(position);
         holder.mTitle.setText(audioData.getTITLE());
         holder.mArtist.setText(audioData.getARTIST());

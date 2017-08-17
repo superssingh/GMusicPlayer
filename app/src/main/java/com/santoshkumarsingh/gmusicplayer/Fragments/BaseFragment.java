@@ -18,7 +18,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
 
-import com.santoshkumarsingh.gmusicplayer.Adapters.SongAdapter;
+import com.santoshkumarsingh.gmusicplayer.Adapters.AudioAdapter;
 import com.santoshkumarsingh.gmusicplayer.Models.AudioData;
 import com.santoshkumarsingh.gmusicplayer.R;
 
@@ -32,7 +32,7 @@ public class BaseFragment extends Fragment {
 
     private OnFragmentInteractionListener mListener;
     private List<AudioData> audioDataList;
-    SongAdapter songAdapter;
+    AudioAdapter audioAdapter;
     private View view;
     @BindView(R.id.recyclerView)
     RecyclerView recyclerView;
@@ -61,10 +61,10 @@ public class BaseFragment extends Fragment {
     private void configRecycleView() {
         linearLayoutManager = new LinearLayoutManager(getContext());
         recyclerView.setLayoutManager(linearLayoutManager);
-        songAdapter=new SongAdapter(mListener);
-        songAdapter.addSongs(audioDataList);
-        songAdapter.notifyDataSetChanged();
-        recyclerView.setAdapter(songAdapter);
+        audioAdapter =new AudioAdapter(mListener);
+        audioAdapter.addSongs(audioDataList);
+        audioAdapter.notifyDataSetChanged();
+        recyclerView.setAdapter(audioAdapter);
     }
 
     private void checkPermission() {
