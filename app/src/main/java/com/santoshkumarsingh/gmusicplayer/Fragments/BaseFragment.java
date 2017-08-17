@@ -19,7 +19,7 @@ import android.view.ViewGroup;
 import android.widget.Toast;
 
 import com.santoshkumarsingh.gmusicplayer.Adapters.SongAdapter;
-import com.santoshkumarsingh.gmusicplayer.Models.Song;
+import com.santoshkumarsingh.gmusicplayer.Models.AudioData;
 import com.santoshkumarsingh.gmusicplayer.R;
 
 import java.util.ArrayList;
@@ -31,12 +31,12 @@ import butterknife.ButterKnife;
 public class BaseFragment extends Fragment {
 
     private OnFragmentInteractionListener mListener;
-    private List<Song> songList;
+    private List<AudioData> audioDataList;
     SongAdapter songAdapter;
     private View view;
     @BindView(R.id.recyclerView)
     RecyclerView recyclerView;
-    RecyclerView.LayoutManager linearLayoutManager;
+    LinearLayoutManager linearLayoutManager;
 
     public BaseFragment() {
     }
@@ -52,29 +52,30 @@ public class BaseFragment extends Fragment {
         // Inflate the layout for this fragment
         view = inflater.inflate(R.layout.fragment_base, container, false);
         ButterKnife.bind(this, view);
-        songList = new ArrayList<>();
-        checkPermission();
+        audioDataList = new ArrayList<>();
         configRecycleView();
-
+        checkPermission();
         return view;
     }
 
     private void configRecycleView() {
         linearLayoutManager = new LinearLayoutManager(getContext());
         recyclerView.setLayoutManager(linearLayoutManager);
+        songAdapter=new SongAdapter(mListener);
+        songAdapter.addSongs(audioDataList);
+        songAdapter.notifyDataSetChanged();
         recyclerView.setAdapter(songAdapter);
     }
 
     private void checkPermission() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+        if (Build.VERSION.SDK_INT >= 23) {
             if (ContextCompat.checkSelfPermission(getContext(), Manifest.permission.READ_EXTERNAL_STORAGE)
                     != PackageManager.PERMISSION_GRANTED) {
                 requestPermissions(new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, 24);
                 return;
             }
-        } else {
-            loadSongs();
         }
+        loadAudioFiles();
     }
 
     @Override
@@ -82,7 +83,7 @@ public class BaseFragment extends Fragment {
         switch (requestCode) {
             case 24:
                 if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    loadSongs();
+                    loadAudioFiles();
                 } else {
                     Toast.makeText(getActivity(), "Permission Denied", Toast.LENGTH_LONG).show();
                     checkPermission();
@@ -94,7 +95,7 @@ public class BaseFragment extends Fragment {
         }
     }
 
-    private void loadSongs() {
+    private void loadAudioFiles() {
 
         Uri uri = android.provider.MediaStore.Audio.Media.EXTERNAL_CONTENT_URI;
         String selection = MediaStore.Audio.Media.IS_MUSIC + "!=0";
@@ -105,32 +106,39 @@ public class BaseFragment extends Fragment {
                     String title = cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.DISPLAY_NAME));
                     String artist = cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.ARTIST));
                     String url = cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.DATA));
+                    String thumb=cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.ALBUM));
 
-                    Song song = new Song(title, artist, url);
-                    songList.add(song);
+                    AudioData audioData = new AudioData(title, artist, url,thumb);
+                    audioDataList.add(audioData);
                 } while (cursor.moveToNext());
             }
             cursor.close();
-            songAdapter = new SongAdapter(mListener,songList);
-            songAdapter.notifyDataSetChanged();
-
-        }else{
-            Toast.makeText(getActivity(),"Query Failed, Please Retry",Toast.LENGTH_SHORT).show();
         }
-
     }
 
-//    private void setData() {
-//        for (int i = 0; i < 11; i++) {
-//            Song song = new Song();
-//            song.setTITLE("Song Title-" + i);
-//            song.setARTIST("Song Artist Name" + i);
-//            song.setURL("Song URL");
+//    private void loadVideoFiles() {
 //
-//            songList.add(song);
+//        Uri uri = android.provider.MediaStore.Video.Media.EXTERNAL_CONTENT_URI;
+//        String selection = MediaStore.Audio.Media.IS_MUSIC + "!=0";
+//        Cursor cursor = getActivity().getContentResolver().query(uri, null, selection, null, null);
+//        if (cursor != null) {
+//            if (cursor.moveToFirst()) {
+//                do {
+//                    String title = cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.DISPLAY_NAME));
+//                    String artist = cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.ARTIST));
+//                    String url = cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.DATA));
+//
+//                    AudioData audioData = new AudioData(title, artist, url);
+//                    audioDataList.add(audioData);
+//                } while (cursor.moveToNext());
+//            }
+//            cursor.close();
 //        }
-//        songAdapter.addSongs(songList);
 //    }
+
+
+
+
 
     @Override
     public void onAttach(Context context) {
@@ -152,7 +160,7 @@ public class BaseFragment extends Fragment {
     @Override
     public void onDestroy() {
         super.onDestroy();
-        songList.clear();
+        audioDataList.clear();
     }
 
     public interface OnFragmentInteractionListener {

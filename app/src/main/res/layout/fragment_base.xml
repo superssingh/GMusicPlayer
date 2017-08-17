@@ -3,7 +3,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:background="@color/lightGray"
+    android:background="@drawable/background1"
     tools:context="com.santoshkumarsingh.gmusicplayer.Fragments.BaseFragment">
 
     <android.support.v7.widget.RecyclerView

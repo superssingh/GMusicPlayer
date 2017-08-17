@@ -8,7 +8,7 @@ import android.widget.Button;
 import android.widget.TextView;
 
 import com.santoshkumarsingh.gmusicplayer.Fragments.BaseFragment;
-import com.santoshkumarsingh.gmusicplayer.Models.Song;
+import com.santoshkumarsingh.gmusicplayer.Models.AudioData;
 import com.santoshkumarsingh.gmusicplayer.R;
 
 import java.util.List;
@@ -19,12 +19,11 @@ import java.util.List;
 
 public class SongAdapter extends RecyclerView.Adapter<SongAdapter.ViewHolder>{
 
-    private List<Song> songList;
+    private List<AudioData> audioDataList;
     private BaseFragment.OnFragmentInteractionListener listener;
 
-    public SongAdapter(BaseFragment.OnFragmentInteractionListener listener, List<Song> songList) {
+    public SongAdapter(BaseFragment.OnFragmentInteractionListener listener) {
         this.listener=listener;
-        this.songList=songList;
     }
 
     @Override
@@ -36,20 +35,20 @@ public class SongAdapter extends RecyclerView.Adapter<SongAdapter.ViewHolder>{
 
     @Override
     public void onBindViewHolder(final SongAdapter.ViewHolder holder, int position) {
-        final Song song = songList.get(position);
-        holder.mTitle.setText(song.getTITLE());
-        holder.mArtist.setText(song.getARTIST());
+        final AudioData audioData = audioDataList.get(position);
+        holder.mTitle.setText(audioData.getTITLE());
+        holder.mArtist.setText(audioData.getARTIST());
         holder.mPlay_Pause.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                listener.onFragmentInteraction(song.getURL());
+                listener.onFragmentInteraction(audioData.getURL());
             }
         });
     }
 
     @Override
     public int getItemCount() {
-        return songList.size();
+        return audioDataList.size();
     }
 
     public class ViewHolder extends RecyclerView.ViewHolder{
@@ -66,8 +65,8 @@ public class SongAdapter extends RecyclerView.Adapter<SongAdapter.ViewHolder>{
 
     }
 
-    public void addSongs(List<Song> songList){
-        this.songList = songList;
+    public void addSongs(List<AudioData> audioDataList){
+        this.audioDataList = audioDataList;
         notifyDataSetChanged();
     }
 }

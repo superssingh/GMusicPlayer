@@ -1,13 +1,13 @@
 package com.santoshkumarsingh.gmusicplayer.Models;
 
 /**
- * Created by santoshsingh on 17/08/17.
+ * Created by santoshsingh on 18/08/17.
  */
 
-public class Song {
+public class VideoData {
     private String TITLE, ARTIST, URL;
 
-    public Song(String TITLE, String ARTIST, String URL) {
+    public VideoData(String TITLE, String ARTIST, String URL) {
         this.TITLE = TITLE;
         this.ARTIST = ARTIST;
         this.URL = URL;

@@ -6,13 +6,10 @@ import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.support.annotation.Nullable;
-import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
 
 import com.santoshkumarsingh.gmusicplayer.Fragments.BaseFragment;
 import com.santoshkumarsingh.gmusicplayer.R;
-
-import java.util.jar.Manifest;
 
 
 public class MainActivity extends AppCompatActivity implements BaseFragment.OnFragmentInteractionListener{
@@ -59,6 +56,5 @@ public class MainActivity extends AppCompatActivity implements BaseFragment.OnFr
 
         }
     }
-
 
 }
