@@ -1,13 +1,13 @@
 package com.santoshkumarsingh.gmusicplayer.Adapters;
 
+import android.content.Context;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.TextView;
 
-import com.santoshkumarsingh.gmusicplayer.Fragments.BaseFragment;
 import com.santoshkumarsingh.gmusicplayer.Models.AudioData;
 import com.santoshkumarsingh.gmusicplayer.R;
 
@@ -19,11 +19,12 @@ import java.util.List;
 
 public class AudioAdapter extends RecyclerView.Adapter<AudioAdapter.ViewHolder>{
 
+    Context context;
     private List<AudioData> audioDataList;
-    private BaseFragment.OnFragmentInteractionListener listener;
+    SongOnClickListener SongOnClickListener;
 
-    public AudioAdapter(BaseFragment.OnFragmentInteractionListener listener) {
-        this.listener=listener;
+    public AudioAdapter(Context context ) {
+        this.context=context;
     }
 
     @Override
@@ -34,14 +35,17 @@ public class AudioAdapter extends RecyclerView.Adapter<AudioAdapter.ViewHolder>{
     }
 
     @Override
-    public void onBindViewHolder(final AudioAdapter.ViewHolder holder, int position) {
+    public void onBindViewHolder(final AudioAdapter.ViewHolder holder, final int position) {
         final AudioData audioData = audioDataList.get(position);
         holder.mTitle.setText(audioData.getTITLE());
         holder.mArtist.setText(audioData.getARTIST());
+
         holder.mPlay_Pause.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                listener.onFragmentInteraction(audioData.getURL());
+                if (SongOnClickListener!=null){
+                    SongOnClickListener.OnClick(holder.mPlay_Pause,holder.itemView,audioData.getURL(),position);
+                }
             }
         });
     }
@@ -54,19 +58,25 @@ public class AudioAdapter extends RecyclerView.Adapter<AudioAdapter.ViewHolder>{
     public class ViewHolder extends RecyclerView.ViewHolder{
 
         private TextView mTitle, mArtist;
-        private Button mPlay_Pause;
+        private ImageButton mPlay_Pause;
         public ViewHolder(View itemView) {
             super(itemView);
             mTitle=(TextView)itemView.findViewById(R.id.song_Title);
             mArtist=(TextView)itemView.findViewById(R.id.song_Artist);
-            mPlay_Pause=(Button)itemView.findViewById(R.id.play_Pause);
+            mPlay_Pause=(ImageButton) itemView.findViewById(R.id.play_Pause);
         }
-
-
     }
 
     public void addSongs(List<AudioData> audioDataList){
         this.audioDataList = audioDataList;
         notifyDataSetChanged();
+    }
+
+    public interface SongOnClickListener {
+        void OnClick(ImageButton button, View view, String URL, int position);
+    }
+
+    public void setOnClickListener(SongOnClickListener SongOnClickListener){
+        this.SongOnClickListener=SongOnClickListener;
     }
 }

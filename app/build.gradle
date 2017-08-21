@@ -23,6 +23,7 @@ android {
 final APPCOMPAT_VERSION = '25.3.1'
 final BUTTERKNIFE_VERSION = '8.8.1'
 //final EXO_PLAYER_VERSION = 'r2.4.0'
+final GLIDE_VERSION='4.0.0'
 
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
@@ -35,9 +36,15 @@ dependencies {
     compile "com.android.support:recyclerview-v7:$APPCOMPAT_VERSION"
     compile "com.android.support:cardview-v7:$APPCOMPAT_VERSION"
     compile "com.jakewharton:butterknife:$BUTTERKNIFE_VERSION"
-//    compile "com.google.android.exoplayer:exoplayer:$EXO_PLAYER_VERSION"
+    compile "com.github.bumptech.glide:glide:$GLIDE_VERSION"
+
     testCompile 'junit:junit:4.12'
     annotationProcessor "com.jakewharton:butterknife-compiler:$BUTTERKNIFE_VERSION"
+    annotationProcessor "com.github.bumptech.glide:compiler:$GLIDE_VERSION"
+
+//    compile "com.google.android.exoplayer:exoplayer:$EXO_PLAYER_VERSION"
+//    compile "com.google.android.exoplayer:exoplayer-core:$EXO_PLAYER_VERSION"
+//    compile "com.google.android.exoplayer:exoplayer-ui:$EXO_PLAYER_VERSION"
 
 
 }

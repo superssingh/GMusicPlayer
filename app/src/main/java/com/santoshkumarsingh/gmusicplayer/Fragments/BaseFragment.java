@@ -1,9 +1,9 @@
 package com.santoshkumarsingh.gmusicplayer.Fragments;
 
 import android.Manifest;
-import android.content.Context;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
+import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -11,32 +11,39 @@ import android.provider.MediaStore;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
+import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageButton;
 import android.widget.Toast;
 
 import com.santoshkumarsingh.gmusicplayer.Adapters.AudioAdapter;
 import com.santoshkumarsingh.gmusicplayer.Models.AudioData;
 import com.santoshkumarsingh.gmusicplayer.R;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
+import static com.santoshkumarsingh.gmusicplayer.R.drawable.ic_pause;
+
 public class BaseFragment extends Fragment {
 
-    private OnFragmentInteractionListener mListener;
-    private List<AudioData> audioDataList;
-    AudioAdapter audioAdapter;
-    private View view;
     @BindView(R.id.recyclerView)
     RecyclerView recyclerView;
-    LinearLayoutManager linearLayoutManager;
+
+//    private OnFragmentInteractionListener mListener;
+    private List<AudioData> audioDataList;
+    private View view;
+    private LinearLayoutManager linearLayoutManager;
+    AudioAdapter audioAdapter;
+    MediaPlayer mediaPlayer;
 
     public BaseFragment() {
     }
@@ -53,19 +60,55 @@ public class BaseFragment extends Fragment {
         view = inflater.inflate(R.layout.fragment_base, container, false);
         ButterKnife.bind(this, view);
         audioDataList = new ArrayList<>();
+        mediaPlayer = new MediaPlayer();
         configRecycleView();
         checkPermission();
+
         return view;
+    }
+
+    private void setSongIntoMediaPlayer(String songUrl) {
+
     }
 
     private void configRecycleView() {
         linearLayoutManager = new LinearLayoutManager(getContext());
+        DividerItemDecoration itemDecoration = new DividerItemDecoration(recyclerView.getContext(), linearLayoutManager.getOrientation());
         recyclerView.setLayoutManager(linearLayoutManager);
-        audioAdapter =new AudioAdapter(mListener);
+        recyclerView.addItemDecoration(itemDecoration);
+        audioAdapter = new AudioAdapter(getActivity());
         audioAdapter.addSongs(audioDataList);
         audioAdapter.notifyDataSetChanged();
         recyclerView.setAdapter(audioAdapter);
+
+        audioAdapter.setOnClickListener(new AudioAdapter.SongOnClickListener() {
+            @Override
+            public void OnClick(final ImageButton button, View view, String URL, int position) {
+                if (mediaPlayer.isPlaying()) {
+                    mediaPlayer.pause();
+                    button.setBackgroundResource(R.drawable.ic_play);
+                }else if(mediaPlayer.equals(position)){
+                    mediaPlayer.start();
+                }else {
+                    try {
+                        mediaPlayer.reset();
+                        mediaPlayer.setDataSource(URL);
+                        mediaPlayer.prepareAsync();
+                        mediaPlayer.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
+                            @Override
+                            public void onPrepared(MediaPlayer mp) {
+                                mp.start();
+                                button.setBackgroundResource(ic_pause);
+                            }
+                        });
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+        });
     }
+
 
     private void checkPermission() {
         if (Build.VERSION.SDK_INT >= 23) {
@@ -96,7 +139,6 @@ public class BaseFragment extends Fragment {
     }
 
     private void loadAudioFiles() {
-
         Uri uri = android.provider.MediaStore.Audio.Media.EXTERNAL_CONTENT_URI;
         String selection = MediaStore.Audio.Media.IS_MUSIC + "!=0";
         Cursor cursor = getActivity().getContentResolver().query(uri, null, selection, null, null);
@@ -106,9 +148,8 @@ public class BaseFragment extends Fragment {
                     String title = cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.DISPLAY_NAME));
                     String artist = cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.ARTIST));
                     String url = cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.DATA));
-                    String thumb=cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.ALBUM));
 
-                    AudioData audioData = new AudioData(title, artist, url,thumb);
+                    AudioData audioData = new AudioData(title, artist, url);
                     audioDataList.add(audioData);
                 } while (cursor.moveToNext());
             }
@@ -116,54 +157,36 @@ public class BaseFragment extends Fragment {
         }
     }
 
-//    private void loadVideoFiles() {
-//
-//        Uri uri = android.provider.MediaStore.Video.Media.EXTERNAL_CONTENT_URI;
-//        String selection = MediaStore.Audio.Media.IS_MUSIC + "!=0";
-//        Cursor cursor = getActivity().getContentResolver().query(uri, null, selection, null, null);
-//        if (cursor != null) {
-//            if (cursor.moveToFirst()) {
-//                do {
-//                    String title = cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.DISPLAY_NAME));
-//                    String artist = cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.ARTIST));
-//                    String url = cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.DATA));
-//
-//                    AudioData audioData = new AudioData(title, artist, url);
-//                    audioDataList.add(audioData);
-//                } while (cursor.moveToNext());
-//            }
-//            cursor.close();
+
+//    @Override
+//    public void onAttach(Context context) {
+//        super.onAttach(context);
+//        if (context instanceof OnFragmentInteractionListener) {
+//            mListener = (OnFragmentInteractionListener) context;
+//        } else {
+//            throw new RuntimeException(context.toString()
+//                    + " must implement OnFragmentInteractionListener");
 //        }
 //    }
-
-
-
-
-
-    @Override
-    public void onAttach(Context context) {
-        super.onAttach(context);
-        if (context instanceof OnFragmentInteractionListener) {
-            mListener = (OnFragmentInteractionListener) context;
-        } else {
-            throw new RuntimeException(context.toString()
-                    + " must implement OnFragmentInteractionListener");
-        }
-    }
 
     @Override
     public void onDetach() {
         super.onDetach();
-        mListener = null;
+//        mListener = null;
+        mediaPlayer.release();
+        mediaPlayer=null;
+        audioDataList.clear();
     }
 
     @Override
     public void onDestroy() {
         super.onDestroy();
-        audioDataList.clear();
     }
 
-    public interface OnFragmentInteractionListener {
-        void onFragmentInteraction(String data);
-    }
+
+
+
+//    public interface OnFragmentInteractionListener {
+//        void onFragmentInteraction(Button button, View view, String songURL, int Position);
+//    }
 }
